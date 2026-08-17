@@ -45,6 +45,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return true;
     },
+    async jwt({ token, user, account }) {
+      if (account && user?.email) {
+        const result = await pool.query("SELECT id FROM users WHERE email = $1", [user.email]);
+        if (result.rows[0]) token.id = result.rows[0].id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token?.id) session.user.id = token.id;
+      return session;
+    },
   },
   pages: {
     signIn: "/login",

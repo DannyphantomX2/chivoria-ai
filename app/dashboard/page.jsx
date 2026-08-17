@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { MODULES } from "@/lib/course-content";
 import {
   LayoutDashboard,
@@ -36,9 +36,27 @@ const STREAK_DAYS = ["M", "T", "W", "T", "F", "S", "S"];
 export default function CourseDashboard() {
   const [activeModule, setActiveModule] = useState(1);
   const [navOpen, setNavOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [progress, setProgress] = useState(null);
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    fetch("/api/progress")
+      .then((r) => r.json())
+      .then((data) => setProgress(data))
+      .catch(() => {});
+  }, []);
 
   const current = MODULES.find((m) => m.id === activeModule);
+
+  function resume() {
+    if (progress?.lastViewed) {
+      router.push(`/modules/${progress.lastViewed.moduleId}?lesson=${progress.lastViewed.lessonIndex}`);
+    } else {
+      router.push("/modules/1");
+    }
+  }
 
   return (
     <div
@@ -135,10 +153,22 @@ export default function CourseDashboard() {
               AI Video Creation for Beginners, you are mid-scene on Module {activeModule}.
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="w-9 h-9 rounded-full flex items-center justify-center border" style={{ borderColor: "var(--border-strong)" }}>
+          <div className="flex items-center gap-3 relative">
+            <button
+              onClick={() => setNotifOpen((v) => !v)}
+              className="w-9 h-9 rounded-full flex items-center justify-center border"
+              style={{ borderColor: "var(--border-strong)" }}
+            >
               <Bell size={16} />
             </button>
+            {notifOpen && (
+              <div
+                className="absolute right-0 top-11 w-56 rounded-lg border p-3 z-10"
+                style={{ background: "var(--bg-panel)", borderColor: "var(--border)" }}
+              >
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>No notifications yet.</p>
+              </div>
+            )}
             <div className="w-9 h-9 rounded-full" style={{ background: "var(--teal)" }} />
           </div>
         </div>
@@ -146,9 +176,9 @@ export default function CourseDashboard() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
             { label: "Modules unlocked", value: "6 / 6", note: "Full course open" },
-            { label: "Lessons completed", value: "0", note: "Start Module 1 to begin" },
-            { label: "Watch time", value: "0m", note: "Nothing logged yet" },
-            { label: "Certificate", value: "0%", note: "Finish all modules to earn it" },
+            { label: "Lessons completed", value: String(progress?.completedCount ?? 0), note: progress ? `of ${progress.totalLessons} available` : "Loading..." },
+            { label: "Watch time", value: `${progress?.watchMinutes ?? 0}m`, note: "Estimated from lessons done" },
+            { label: "Certificate", value: `${progress?.certificatePercent ?? 0}%`, note: "Finish all modules to earn it" },
           ].map((s) => (
             <div key={s.label} className="rounded-xl p-4 border" style={{ background: "var(--bg-panel)", borderColor: "var(--border)" }}>
               <p className="text-xs" style={{ color: "var(--text-muted)" }}>{s.label}</p>
@@ -218,8 +248,9 @@ export default function CourseDashboard() {
               </div>
             </div>
             <button
+              onClick={resume}
               className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg"
-              style={{ background: "var(--accent)", color: "#14130F" }}
+              style={{ background: "var(--accent)", color: "var(--bg)" }}
             >
               <PlayCircle size={16} /> Resume module
             </button>
@@ -249,9 +280,15 @@ export default function CourseDashboard() {
               <p className="text-sm font-medium">Recently studied</p>
             </div>
             <div className="flex flex-col divide-y" style={{ borderColor: "var(--border)" }}>
-              <p className="text-sm py-2.5" style={{ color: "var(--text-muted)" }}>
-                Nothing studied yet. Start Module 1 on the timeline above.
-              </p>
+              {progress?.lastViewed ? (
+                <p className="text-sm py-2.5" style={{ color: "var(--text-secondary)" }}>
+                  Module {progress.lastViewed.moduleId}, lesson {progress.lastViewed.lessonIndex + 1}
+                </p>
+              ) : (
+                <p className="text-sm py-2.5" style={{ color: "var(--text-muted)" }}>
+                  Nothing studied yet. Start Module 1 on the timeline above.
+                </p>
+              )}
             </div>
           </div>
         </div>
