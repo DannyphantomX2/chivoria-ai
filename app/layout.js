@@ -1,5 +1,6 @@
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeContext";
+import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 
 export const metadata = {
   title: "Chivoria AI",
@@ -9,8 +10,24 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem("chivoria_theme");
+                  if (saved) document.documentElement.setAttribute("data-theme", saved);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <SessionProviderWrapper>
+          <ThemeProvider>{children}</ThemeProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );

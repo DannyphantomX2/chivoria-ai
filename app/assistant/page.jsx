@@ -39,7 +39,7 @@ export default function AssistantPage() {
   return (
     <div
       className="min-h-screen w-full px-5 md:px-10 py-10"
-      style={{ background: "#14130F", color: "#EDE7DA", fontFamily: "'Inter', sans-serif" }}
+      style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "'Inter', sans-serif" }}
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -48,41 +48,41 @@ export default function AssistantPage() {
       `}</style>
 
       <div className="max-w-2xl mx-auto">
-        <Link href="/dashboard" className="text-xs" style={{ color: "#7A7568" }}>
+        <Link href="/dashboard" className="text-xs" style={{ color: "var(--text-muted)" }}>
           Back to dashboard
         </Link>
         <div className="flex items-center gap-2 mt-2 mb-2">
-          <Sparkles size={18} color="#E8A33D" />
+          <Sparkles size={18} color="var(--accent)" />
           <h1 className="font-display text-2xl font-semibold">AI Prompt Assistant</h1>
         </div>
-        <p className="text-sm mb-6" style={{ color: "#7A7568" }}>
+        <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>
           Fill in what you know. This uses the template from Module 2, Lesson 9, and builds the finished prompt below as you type.
         </p>
 
         <div className="grid sm:grid-cols-2 gap-3 mb-6">
           {FIELDS.map((f) => (
             <div key={f.key}>
-              <label className="text-xs" style={{ color: "#7A7568" }}>{f.label}</label>
+              <label className="text-xs" style={{ color: "var(--text-muted)" }}>{f.label}</label>
               <input
                 value={values[f.key] || ""}
                 onChange={(e) => update(f.key, e.target.value)}
                 placeholder={f.placeholder}
                 className="w-full mt-1 px-3 py-2 rounded-lg text-sm outline-none border"
-                style={{ background: "#171610", borderColor: "rgba(237,231,218,0.12)", color: "#EDE7DA" }}
+                style={{ background: "var(--bg-input)", borderColor: "var(--border-strong)", color: "var(--text)" }}
               />
             </div>
           ))}
         </div>
 
-        <div className="rounded-xl border p-4" style={{ background: "#1E1C17", borderColor: "rgba(232,163,61,0.3)" }}>
+        <div className="rounded-xl border p-4" style={{ background: "var(--bg-panel)", borderColor: "var(--border-strong)" }}>
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs uppercase tracking-wide" style={{ color: "#7A7568" }}>Finished prompt</p>
-            <button onClick={copyPrompt} className="flex items-center gap-1 text-xs" style={{ color: "#E8A33D" }}>
+            <p className="text-xs uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Finished prompt</p>
+            <button onClick={copyPrompt} className="flex items-center gap-1 text-xs" style={{ color: "var(--accent)" }}>
               {copied ? <Check size={14} /> : <Copy size={14} />}
               {copied ? "Copied" : "Copy"}
             </button>
           </div>
-          <p className="font-mono text-sm leading-relaxed" style={{ color: "#E8A33D" }}>{prompt}</p>
+          <p className="font-mono text-sm leading-relaxed" style={{ color: "var(--accent)" }}>{prompt}</p>
         </div>
       </div>
     </div>

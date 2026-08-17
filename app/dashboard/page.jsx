@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { MODULES } from "@/lib/course-content";
 import {
   LayoutDashboard,
@@ -40,6 +41,7 @@ export default function CourseDashboard() {
   const [progress, setProgress] = useState(null);
   const pathname = usePathname();
   const router = useRouter();
+  const { data: session } = useSession();
 
   useEffect(() => {
     fetch("/api/progress")
@@ -148,7 +150,7 @@ export default function CourseDashboard() {
 
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="font-display text-2xl font-semibold">Welcome back, Maxwell</h1>
+            <h1 className="font-display text-2xl font-semibold">Welcome back, {session?.user?.name?.split(" ")[0] || "there"}</h1>
             <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
               AI Video Creation for Beginners, you are mid-scene on Module {activeModule}.
             </p>
