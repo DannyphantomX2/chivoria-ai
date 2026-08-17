@@ -40,6 +40,7 @@ export default function SupportPage() {
         </div>
 
         
+        <a
           href={"mailto:" + SUPPORT_EMAIL}
           className="flex items-center justify-center gap-2 text-sm font-medium px-4 py-3 rounded-lg"
           style={{ background: "var(--accent)", color: "var(--bg)" }}
