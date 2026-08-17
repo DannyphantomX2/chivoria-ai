@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { Film } from "lucide-react";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -50,13 +49,10 @@ export default function SignupPage() {
       `}</style>
 
       <div className="w-full max-w-sm">
-        <div className="flex items-center gap-2 mb-8 justify-center">
-          <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ background: "var(--accent)" }}>
-            <Film size={16} color="var(--bg)" />
+        <div className="flex items-center justify-center mb-8">
+          <div className="rounded-lg p-1.5" style={{ background: "#FFFFFF" }}>
+            <img src="/logo.jpg" alt="Chivoria" className="h-10 w-auto rounded-sm" />
           </div>
-          <span className="font-display text-lg font-semibold uppercase tracking-tight">
-            Chivoria <span style={{ color: "var(--accent)" }}>AI</span>
-          </span>
         </div>
 
         <div className="rounded-xl border p-6" style={{ background: "var(--bg-panel)", borderColor: "var(--border)" }}>
@@ -64,20 +60,6 @@ export default function SignupPage() {
           <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>
             Module 1 opens the moment you sign up.
           </p>
-
-          <button
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            className="w-full flex items-center justify-center gap-2 text-sm font-medium py-2.5 rounded-lg border mb-5"
-            style={{ borderColor: "var(--border-strong)", color: "var(--text)" }}
-          >
-            Continue with Google
-          </button>
-
-          <div className="flex items-center gap-3 mb-5">
-            <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
-            <span className="text-xs" style={{ color: "var(--text-muted)" }}>or</span>
-            <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
-          </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <div>
@@ -114,9 +96,7 @@ export default function SignupPage() {
               />
             </div>
 
-            {message && (
-              <p className="text-xs" style={{ color: "#E07856" }}>{message}</p>
-            )}
+            {message && <p className="text-xs" style={{ color: "#E07856" }}>{message}</p>}
 
             <button
               type="submit"
@@ -127,6 +107,14 @@ export default function SignupPage() {
               {loading ? "Creating..." : "Create account"}
             </button>
           </form>
+
+          <button
+            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+            className="w-full text-center text-xs mt-4"
+            style={{ color: "var(--accent)" }}
+          >
+            Continue with Google
+          </button>
 
           <p className="text-xs mt-5 text-center" style={{ color: "var(--text-muted)" }}>
             Already have an account? <a href="/login" style={{ color: "var(--accent)" }}>Log in</a>
