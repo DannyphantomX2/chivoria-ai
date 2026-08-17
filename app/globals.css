@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+:root {
+  --bg: #14130F;
+  --bg-panel: #1E1C17;
+  --bg-sidebar: #181712;
+  --bg-input: #171610;
+  --text: #EDE7DA;
+  --text-secondary: #B8B2A3;
+  --text-muted: #7A7568;
+  --border: rgba(237,231,218,0.08);
+  --border-strong: rgba(237,231,218,0.15);
+  --accent: #E8A33D;
+  --accent-soft: rgba(232,163,61,0.12);
+  --teal: #3FA9A0;
+}
+
+[data-theme="light"] {
+  --bg: #F6F3EC;
+  --bg-panel: #FFFFFF;
+  --bg-sidebar: #EFEAE0;
+  --bg-input: #FFFFFF;
+  --text: #1A1812;
+  --text-secondary: #4A473F;
+  --text-muted: #8A8478;
+  --border: rgba(20,19,15,0.08);
+  --border-strong: rgba(20,19,15,0.18);
+  --accent: #C9861F;
+  --accent-soft: rgba(201,134,31,0.12);
+  --teal: #2E8880;
+}
