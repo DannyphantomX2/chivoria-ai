@@ -3,13 +3,21 @@ import pool from "@/lib/db";
 import { LESSON_CONTENT } from "@/lib/course-content";
 
 export async function GET() {
+  const totalLessons = Object.values(LESSON_CONTENT).reduce((sum, m) => sum + m.lessons.length, 0);
+
   const session = await auth();
   if (!session?.user?.id) {
-    return Response.json({ error: "Not logged in." }, { status: 401 });
+    return Response.json({
+      completedCount: 0,
+      totalLessons,
+      certificatePercent: 0,
+      watchMinutes: 0,
+      completed: [],
+      lastViewed: null,
+      loggedIn: false,
+    });
   }
   const userId = session.user.id;
-
-  const totalLessons = Object.values(LESSON_CONTENT).reduce((sum, m) => sum + m.lessons.length, 0);
 
   const completedResult = await pool.query(
     "SELECT module_id, lesson_index FROM lesson_progress WHERE user_id = $1",
@@ -25,9 +33,14 @@ export async function GET() {
     ? { moduleId: lastViewedResult.rows[0].module_id, lessonIndex: lastViewedResult.rows[0].lesson_index }
     : null;
 
+  const watchResult = await pool.query(
+    "SELECT COALESCE(SUM(seconds), 0) AS total_seconds FROM lesson_watch WHERE user_id = $1",
+    [userId]
+  );
+  const watchMinutes = Math.round((watchResult.rows[0]?.total_seconds || 0) / 60);
+
   const completedCount = completed.length;
   const certificatePercent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
-  const watchMinutes = completedCount * 6;
 
-  return Response.json({ completedCount, totalLessons, certificatePercent, watchMinutes, completed, lastViewed });
+  return Response.json({ completedCount, totalLessons, certificatePercent, watchMinutes, completed, lastViewed, loggedIn: true });
 }

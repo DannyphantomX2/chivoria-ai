@@ -46,7 +46,7 @@ export default function CourseDashboard() {
   useEffect(() => {
     fetch("/api/progress")
       .then((r) => r.json())
-      .then((data) => setProgress(data))
+      .then((data) => { if (!data.error) setProgress(data); })
       .catch(() => {});
   }, []);
 
