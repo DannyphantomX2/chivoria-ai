@@ -262,18 +262,23 @@ export default function CourseDashboard() {
         <div className="grid md:grid-cols-3 gap-5">
           <div className="rounded-xl border p-5" style={{ background: "var(--bg-panel)", borderColor: "var(--border)" }}>
             <div className="flex items-center gap-2 mb-3">
-              <Flame size={16} color="var(--text-muted)" />
-              <p className="text-sm font-medium">Streak</p>
+              <Flame size={16} color={progress?.streak > 0 ? "var(--accent)" : "var(--text-muted)"} />
+              <p className="text-sm font-medium">Streak {progress?.streak > 0 ? `- ${progress.streak} day${progress.streak === 1 ? "" : "s"}` : ""}</p>
             </div>
             <div className="flex gap-2">
-              {STREAK_DAYS.map((d, i) => (
+              {(progress?.streakDays || STREAK_DAYS.map((d) => ({ label: d, active: false }))).map((d, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <div className="w-full aspect-square rounded-md flex items-center justify-center" style={{ background: "var(--border)" }} />
-                  <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>{d}</span>
+                  <div
+                    className="w-full aspect-square rounded-md flex items-center justify-center"
+                    style={{ background: d.active ? "var(--accent)" : "var(--border)" }}
+                  />
+                  <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>{d.label}</span>
                 </div>
               ))}
             </div>
-            <p className="text-xs mt-3" style={{ color: "var(--text-muted)" }}>Finish a lesson today to start your streak.</p>
+            <p className="text-xs mt-3" style={{ color: "var(--text-muted)" }}>
+              {progress?.streak > 0 ? "Keep it going, finish a lesson today." : "Finish a lesson today to start your streak."}
+            </p>
           </div>
 
           <div className="rounded-xl border p-5 md:col-span-2" style={{ background: "var(--bg-panel)", borderColor: "var(--border)" }}>
