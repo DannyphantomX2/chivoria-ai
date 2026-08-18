@@ -1,18 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { MODULES, LESSON_CONTENT } from "@/lib/course-content";
 import LessonBlocks from "@/components/LessonBlocks";
-import { Lock, ChevronLeft, ChevronRight } from "lucide-react";
+import { Lock, ChevronLeft, ChevronRight, CheckCircle2, Circle } from "lucide-react";
 
 export default function ModuleDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = Number(params.id);
   const module = MODULES.find((m) => m.id === id);
   const content = LESSON_CONTENT[id];
   const [openLesson, setOpenLesson] = useState(0);
+  const [completed, setCompleted] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/progress")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.completed) setCompleted(data.completed);
+      })
+      .catch(() => {});
+  }, []);
+
+  function isDone(lessonIndex) {
+    return completed.some((c) => c.moduleId === id && c.lessonIndex === lessonIndex);
+  }
+
+  async function markComplete(lessonIndex) {
+    if (isDone(lessonIndex)) return;
+    setCompleted((c) => [...c, { moduleId: id, lessonIndex }]);
+    try {
+      await fetch("/api/progress/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ moduleId: id, lessonIndex }),
+      });
+    } catch {
+      setCompleted((c) => c.filter((x) => !(x.moduleId === id && x.lessonIndex === lessonIndex)));
+    }
+  }
 
   if (!module) {
     return (
@@ -23,6 +52,7 @@ export default function ModuleDetailPage() {
   }
 
   const canOpen = module.free;
+  const nextModule = MODULES.find((m) => m.id === id + 1);
 
   return (
     <div
@@ -66,15 +96,16 @@ export default function ModuleDetailPage() {
               <div key={i} className="rounded-xl border overflow-hidden" style={{ background: "#1E1C17", borderColor: "rgba(237,231,218,0.08)" }}>
                 <button
                   onClick={() => setOpenLesson(openLesson === i ? -1 : i)}
-                  className="w-full text-left px-4 py-3 text-sm font-medium"
+                  className="w-full text-left px-4 py-3 text-sm font-medium flex items-center gap-2"
                 >
+                  {isDone(i) ? <CheckCircle2 size={14} color="#3FA9A0" /> : <Circle size={14} color="#7A7568" />}
                   {lesson.title}
                 </button>
                 {openLesson === i && (
                   <div className="px-4 pb-4">
-                    <LessonBlocks blocks={lesson.blocks} />
+                    <LessonBlocks blocks={lesson.blocks} moduleId={id} lessonIndex={i} />
 
-                    <div className="flex items-center justify-between mt-5 pt-4 border-t" style={{ borderColor: "rgba(237,231,218,0.08)" }}>
+                    <div className="flex items-center justify-between mt-5 pt-4 border-t flex-wrap gap-3" style={{ borderColor: "rgba(237,231,218,0.08)" }}>
                       <button
                         onClick={() => setOpenLesson(i - 1)}
                         disabled={i === 0}
@@ -86,17 +117,38 @@ export default function ModuleDetailPage() {
                       >
                         <ChevronLeft size={14} /> Previous
                       </button>
+
                       <button
-                        onClick={() => setOpenLesson(i + 1)}
-                        disabled={i === content.lessons.length - 1}
+                        onClick={() => markComplete(i)}
+                        disabled={isDone(i)}
                         className="flex items-center gap-1 text-xs px-3 py-2 rounded-lg font-medium"
                         style={{
-                          color: i === content.lessons.length - 1 ? "#4A473F" : "#14130F",
-                          background: i === content.lessons.length - 1 ? "transparent" : "#E8A33D",
+                          background: isDone(i) ? "transparent" : "rgba(232,163,61,0.12)",
+                          color: "#E8A33D",
                         }}
                       >
-                        Next lesson <ChevronRight size={14} />
+                        <CheckCircle2 size={14} /> {isDone(i) ? "Completed" : "Mark complete"}
                       </button>
+
+                      {i < content.lessons.length - 1 ? (
+                        <button
+                          onClick={() => setOpenLesson(i + 1)}
+                          className="flex items-center gap-1 text-xs px-3 py-2 rounded-lg font-medium"
+                          style={{ background: "#E8A33D", color: "#14130F" }}
+                        >
+                          Next lesson <ChevronRight size={14} />
+                        </button>
+                      ) : nextModule ? (
+                        <button
+                          onClick={() => router.push(`/modules/${nextModule.id}`)}
+                          className="flex items-center gap-1 text-xs px-3 py-2 rounded-lg font-medium"
+                          style={{ background: "#E8A33D", color: "#14130F" }}
+                        >
+                          Start Module {nextModule.id} <ChevronRight size={14} />
+                        </button>
+                      ) : (
+                        <span className="text-xs" style={{ color: "#4A473F" }}>Last module</span>
+                      )}
                     </div>
                   </div>
                 )}
