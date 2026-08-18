@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { MODULES, LESSON_CONTENT } from "@/lib/course-content";
 import LessonBlocks from "@/components/LessonBlocks";
-import { Lock, ChevronLeft, ChevronRight, CheckCircle2, Circle } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle2, Circle } from "lucide-react";
 
 export default function ModuleDetailPage() {
   const params = useParams();
@@ -24,6 +24,16 @@ export default function ModuleDetailPage() {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (openLesson >= 0 && content) {
+      fetch("/api/progress/view", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ moduleId: id, lessonIndex: openLesson }),
+      }).catch(() => {});
+    }
+  }, [openLesson, id, content]);
 
   function isDone(lessonIndex) {
     return completed.some((c) => c.moduleId === id && c.lessonIndex === lessonIndex);
@@ -51,7 +61,6 @@ export default function ModuleDetailPage() {
     );
   }
 
-  const canOpen = module.free;
   const nextModule = MODULES.find((m) => m.id === id + 1);
 
   return (
@@ -72,25 +81,13 @@ export default function ModuleDetailPage() {
           Module {module.id}: {module.title}
         </h1>
 
-        {!canOpen && (
-          <div className="rounded-xl border p-6 flex items-center gap-3" style={{ background: "#1E1C17", borderColor: "rgba(232,163,61,0.35)" }}>
-            <Lock size={20} color="#E8A33D" />
-            <div>
-              <p className="text-sm font-medium">This module is locked.</p>
-              <p className="text-xs mt-1" style={{ color: "#7A7568" }}>
-                Pay once on the dashboard to open Modules 2 through 6.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {canOpen && !content && (
+        {!content && (
           <div className="rounded-xl border p-6" style={{ background: "#1E1C17", borderColor: "rgba(237,231,218,0.08)" }}>
             <p className="text-sm" style={{ color: "#7A7568" }}>Content for this module is not added yet.</p>
           </div>
         )}
 
-        {canOpen && content && (
+        {content && (
           <div className="flex flex-col gap-2">
             {content.lessons.map((lesson, i) => (
               <div key={i} className="rounded-xl border overflow-hidden" style={{ background: "#1E1C17", borderColor: "rgba(237,231,218,0.08)" }}>

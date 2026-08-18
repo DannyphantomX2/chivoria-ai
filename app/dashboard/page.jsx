@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { MODULES } from "@/lib/course-content";
+import { MODULES, LESSON_CONTENT } from "@/lib/course-content";
 import {
   LayoutDashboard,
   Compass,
@@ -51,6 +51,12 @@ export default function CourseDashboard() {
   }, []);
 
   const current = MODULES.find((m) => m.id === activeModule);
+
+  function isModuleComplete(moduleId) {
+    const lessons = LESSON_CONTENT[moduleId]?.lessons;
+    if (!lessons || !progress?.completed) return false;
+    return lessons.every((_, i) => progress.completed.some((c) => c.moduleId === moduleId && c.lessonIndex === i));
+  }
 
   function resume() {
     if (progress?.lastViewed) {
@@ -216,7 +222,7 @@ export default function CourseDashboard() {
                   >
                     <div className="flex items-center justify-between mb-3">
                       <m.icon size={16} color={isActive ? "var(--accent)" : "var(--text-secondary)"} />
-                      <CheckCircle2 size={14} color="var(--teal)" />
+                      {isModuleComplete(m.id) && <CheckCircle2 size={14} color="var(--teal)" />}
                     </div>
                     <p className="text-xs font-medium leading-snug">{m.title}</p>
                     <p className="font-mono text-[10px] mt-2" style={{ color: "var(--text-muted)" }}>
