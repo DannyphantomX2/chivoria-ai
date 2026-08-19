@@ -35,12 +35,7 @@ export default function CertificatesPage() {
         {progress && done && (
           <div className="rounded-xl border p-6 flex flex-col items-center gap-4" style={{ background: "var(--bg-panel)", borderColor: "var(--border)" }}>
             <img src="/api/certificate" alt="Certificate of completion" className="w-full rounded-lg border" style={{ borderColor: "var(--border)" }} />
-            
-              href="/api/certificate"
-              download="chivoria-certificate.png"
-              className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg"
-              style={{ background: "var(--accent)", color: "var(--bg)" }}
-            >
+            <a href="/api/certificate" download="chivoria-certificate.png" className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg" style={{ background: "var(--accent)", color: "var(--bg)" }}>
               <Download size={16} /> Download certificate
             </a>
           </div>
