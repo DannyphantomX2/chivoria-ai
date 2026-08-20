@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import LogoutButton from "@/components/LogoutButton";
-import ThemeToggle from "@/components/ThemeToggle";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -22,13 +21,6 @@ export default async function SettingsPage() {
         </Link>
         <h1 className="font-display text-2xl font-semibold mt-2 mb-6">Settings</h1>
 
-        <div className="rounded-xl border p-6 mb-4" style={{ background: "var(--bg-panel)", borderColor: "var(--border)" }}>
-          <p className="text-sm font-medium mb-1">Appearance</p>
-          <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>
-            Switch between dark and light mode. This is saved on this device.
-          </p>
-          <ThemeToggle />
-        </div>
 
         {!session && (
           <div className="rounded-xl border p-6" style={{ background: "var(--bg-panel)", borderColor: "var(--border)" }}>
